@@ -10,6 +10,8 @@ from malone.conversation.loop import ConversationLoop
 from malone.conversation.manager import ConversationManager
 from malone.llm.ollama_client import OllamaClient
 from malone.stt.transcriber import Transcriber
+from malone.tools.executor import ToolExecutor
+from malone.tools.registry import ToolRegistry
 from malone.tts.synthesizer import TTSSynthesizer
 
 
@@ -39,6 +41,13 @@ class MaloneApp:
 
         print("  Connecting to Ollama...")
         llm = OllamaClient(self.settings.ollama)
+
+        # Initialize tool system
+        print("  Loading tools...")
+        registry = ToolRegistry()
+        registry.auto_discover()
+        tool_executor = ToolExecutor(registry)
+        print(f"    Registered tools: {registry.list_tools()}")
 
         audio_capture = AudioCapture(
             sample_rate=self.settings.audio.sample_rate,
@@ -70,6 +79,7 @@ class MaloneApp:
             llm=llm,
             tts=tts,
             conversation=conversation,
+            tool_executor=tool_executor,
             silence_threshold=self.settings.vad.silence_threshold,
             min_speech_duration=self.settings.vad.min_speech_duration,
         )

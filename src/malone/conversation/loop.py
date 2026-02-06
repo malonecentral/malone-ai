@@ -9,6 +9,7 @@ from malone.audio.vad import VoiceActivityDetector
 from malone.conversation.manager import ConversationManager
 from malone.llm.base import LLMClient
 from malone.stt.transcriber import Transcriber
+from malone.tools.executor import ToolExecutor
 from malone.tts.synthesizer import TTSSynthesizer
 
 
@@ -31,6 +32,7 @@ class ConversationLoop:
         llm: LLMClient,
         tts: TTSSynthesizer,
         conversation: ConversationManager,
+        tool_executor: ToolExecutor | None = None,
         silence_threshold: float = 0.8,
         min_speech_duration: float = 0.3,
     ):
@@ -41,6 +43,7 @@ class ConversationLoop:
         self.llm = llm
         self.tts = tts
         self.conversation = conversation
+        self.tool_executor = tool_executor
         self.silence_threshold = silence_threshold
         self.min_speech_duration = min_speech_duration
 
@@ -71,11 +74,9 @@ class ConversationLoop:
 
                 print(f"\n  You: {text}")
 
-                # Get LLM response
+                # Get LLM response (with tool calling)
                 self.conversation.add_user(text)
-                response = await self.llm.chat(self.conversation.get_messages())
-                reply = response.content
-                self.conversation.add_assistant(reply)
+                reply = await self._get_response()
 
                 print(f"  Malone: {reply}")
 
@@ -99,6 +100,39 @@ class ConversationLoop:
                 self.state = State.IDLE
         finally:
             self.audio_capture.stop()
+
+    async def _get_response(self) -> str:
+        """Get LLM response, handling tool calls if needed."""
+        tools = None
+        if self.tool_executor:
+            tools = self.tool_executor.get_tool_schemas()
+
+        max_rounds = 5
+        for _ in range(max_rounds):
+            response = await self.llm.chat(
+                self.conversation.get_messages(), tools=tools
+            )
+
+            # No tool calls - return the text response
+            if not response.tool_calls:
+                self.conversation.add_assistant(response.content)
+                return response.content
+
+            # Handle tool calls
+            # Add assistant message with tool calls to history
+            self.conversation.add_assistant_tool_calls(response)
+
+            for tool_call in response.tool_calls:
+                print(f"  [Tool: {tool_call.name}({tool_call.arguments})]")
+                result = await self.tool_executor.execute(
+                    tool_call.name, tool_call.arguments
+                )
+                print(f"  [Result: {result[:200]}]")
+                self.conversation.add_tool_result(tool_call.id, result)
+
+        # Fallback if we hit max rounds
+        self.conversation.add_assistant("I wasn't able to complete that task.")
+        return "I wasn't able to complete that task."
 
     async def _collect_speech(self) -> bytes | None:
         """Collect audio until a complete utterance is detected via VAD."""
