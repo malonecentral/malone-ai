@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 from malone.audio.capture import AudioCapture
 from malone.audio.playback import AudioPlayback
 from malone.audio.vad import VoiceActivityDetector
@@ -18,6 +20,9 @@ class MaloneApp:
         self.settings = get_settings()
 
     async def run(self):
+        # Ensure PulseAudio is configured for WSL2
+        os.environ.setdefault("PULSE_SERVER", "unix:/mnt/wslg/PulseServer")
+
         print("Malone AI starting up...")
         print()
 

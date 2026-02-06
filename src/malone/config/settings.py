@@ -11,7 +11,7 @@ from pydantic_settings import BaseSettings
 class AudioSettings(BaseSettings):
     sample_rate: int = 16000
     channels: int = 1
-    blocksize: int = 480  # 30ms at 16kHz
+    blocksize: int = 512  # 32ms at 16kHz (minimum for Silero VAD)
     input_device: int | None = None
     output_device: int | None = None
 
@@ -35,7 +35,7 @@ class TTSSettings(BaseSettings):
 
 
 class OllamaSettings(BaseSettings):
-    base_url: str = "http://mck8s.malonecentral.com:30021/v1"
+    base_url: str = "http://mcomen.malonecentral.com:11434/v1"
     model: str = "llama3.1:8b"
     timeout: float = 30.0
 

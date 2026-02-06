@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import asyncio
-
-import numpy as np
-import sounddevice as sd
+import os
+import subprocess
 
 
 class AudioPlayback:
-    """Plays audio through the speaker using sounddevice."""
+    """Plays audio through PulseAudio's paplay (reliable on WSL2)."""
 
     def __init__(self, sample_rate: int = 24000, device: int | None = None):
         self.sample_rate = sample_rate
@@ -15,10 +14,17 @@ class AudioPlayback:
 
     async def play(self, audio_data: bytes):
         """Play raw PCM int16 audio data asynchronously."""
-        audio_array = np.frombuffer(audio_data, dtype=np.int16)
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, self._play_sync, audio_array)
+        env = os.environ.copy()
+        env["PULSE_SERVER"] = "unix:/mnt/wslg/PulseServer"
 
-    def _play_sync(self, audio_array: np.ndarray):
-        sd.play(audio_array, samplerate=self.sample_rate, device=self.device)
-        sd.wait()
+        process = await asyncio.create_subprocess_exec(
+            "paplay",
+            "--raw",
+            "--format=s16le",
+            f"--rate={self.sample_rate}",
+            "--channels=1",
+            stdin=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.DEVNULL,
+            env=env,
+        )
+        await process.communicate(input=audio_data)

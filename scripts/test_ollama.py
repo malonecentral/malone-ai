@@ -10,7 +10,7 @@ from openai import AsyncOpenAI
 async def main():
     print("=== Malone AI - Ollama Endpoint Test ===\n")
 
-    base_url = "http://mck8s.malonecentral.com:30021/v1"
+    base_url = "http://mcomen.malonecentral.com:11434/v1"
     model = "llama3.1:8b"
 
     print(f"Endpoint: {base_url}")

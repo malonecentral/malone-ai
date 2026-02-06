@@ -1,7 +1,7 @@
 audio:
   sample_rate: 16000
   channels: 1
-  blocksize: 480
+  blocksize: 512
 
 vad:
   threshold: 0.5
@@ -17,7 +17,7 @@ tts:
   rate: "+0%"
 
 ollama:
-  base_url: "http://mck8s.malonecentral.com:30021/v1"
+  base_url: "http://mcomen.malonecentral.com:11434/v1"
   model: "llama3.1:8b"
 
 claude:
