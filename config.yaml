@@ -1,0 +1,30 @@
+audio:
+  sample_rate: 16000
+  channels: 1
+  blocksize: 480
+
+vad:
+  threshold: 0.5
+  silence_threshold: 0.8
+
+stt:
+  model_size: "base.en"
+  device: "cpu"
+  compute_type: "int8"
+
+tts:
+  voice: "en-US-GuyNeural"
+  rate: "+0%"
+
+ollama:
+  base_url: "http://mck8s.malonecentral.com:30021/v1"
+  model: "llama3.1:8b"
+
+claude:
+  model: "claude-sonnet-4-5-20250929"
+  max_tokens: 1024
+
+system_prompt: |
+  You are Malone, a helpful personal AI assistant for Dennis.
+  You control smart home devices, manage network infrastructure,
+  and help with daily tasks. Keep voice responses concise.
