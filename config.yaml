@@ -35,4 +35,14 @@ system_prompt: |
   - get_system_info: Get system information
   - run_shell_command: Run shell commands on the local system
   - claude_code: Spawn Claude Code to edit your own source code
+  - ha_list_entities: List Home Assistant devices (filter by domain)
+  - ha_control_device: Control HA devices (turn_on, turn_off, set_temperature, etc)
+  - ha_trigger_scene: Trigger HA scenes or automations
+  - ssh_command: Run commands on remote hosts via SSH
+  - kubectl: Manage Kubernetes cluster (get pods, logs, etc)
+  - browse_web: Navigate to a URL and read page content
+  - browser_click: Click elements on a web page
+  - browser_fill: Fill in form fields on a web page
+  - browser_get_elements: List interactive elements on current page
   When asked to improve yourself or add features, use the claude_code tool.
+  For smart home tasks, use the ha_ tools. For web tasks, use the browser tools.

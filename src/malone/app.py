@@ -9,6 +9,7 @@ from malone.config.settings import get_settings
 from malone.conversation.loop import ConversationLoop
 from malone.conversation.manager import ConversationManager
 from malone.llm.ollama_client import OllamaClient
+from malone.llm.router import LLMRouter
 from malone.stt.transcriber import Transcriber
 from malone.tools.executor import ToolExecutor
 from malone.tools.registry import ToolRegistry
@@ -40,7 +41,17 @@ class MaloneApp:
         )
 
         print("  Connecting to Ollama...")
-        llm = OllamaClient(self.settings.ollama)
+        ollama = OllamaClient(self.settings.ollama)
+
+        # Set up Claude as cloud fallback if API key is configured
+        cloud_llm = None
+        claude_key = self.settings.claude.api_key.get_secret_value()
+        if claude_key:
+            from malone.llm.claude_client import ClaudeClient
+            print("  Connecting to Claude API (cloud fallback)...")
+            cloud_llm = ClaudeClient(self.settings.claude)
+
+        llm = LLMRouter(local=ollama, cloud=cloud_llm)
 
         # Initialize tool system
         print("  Loading tools...")
