@@ -4,8 +4,8 @@ audio:
   blocksize: 512
 
 vad:
-  threshold: 0.5
-  silence_threshold: 0.8
+  threshold: 0.6
+  silence_threshold: 1.0
 
 stt:
   model_size: "base.en"
@@ -25,6 +25,9 @@ claude:
   max_tokens: 1024
 
 system_prompt: |
-  You are Malone, a helpful personal AI assistant for Dennis.
-  You control smart home devices, manage network infrastructure,
-  and help with daily tasks. Keep voice responses concise.
+  You are Malone, a personal AI assistant for Dennis.
+  Keep your responses short and conversational - you are speaking out loud.
+  Only state facts you actually know. Do not make up information.
+  If you don't know something, say so honestly.
+  You do not currently have access to the date, time, or any smart home devices.
+  Those capabilities are coming soon.

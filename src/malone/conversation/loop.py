@@ -87,6 +87,14 @@ class ConversationLoop:
                 except Exception as e:
                     print(f"  [TTS error: {e}]")
 
+                # Drain any audio captured during TTS playback (echo prevention)
+                while not self._audio_queue.empty():
+                    try:
+                        self._audio_queue.get_nowait()
+                    except asyncio.QueueEmpty:
+                        break
+                # Brief pause to let echo fade before listening again
+                await asyncio.sleep(0.5)
                 self.vad.reset()
                 self.state = State.IDLE
         finally:
