@@ -29,9 +29,7 @@ class STTSettings(BaseSettings):
 
 
 class TTSSettings(BaseSettings):
-    voice: str = "en-US-GuyNeural"
-    rate: str = "+0%"
-    volume: str = "+0%"
+    voice: str = "en_GB-alba-medium"
 
 
 class OllamaSettings(BaseSettings):

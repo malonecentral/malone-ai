@@ -68,14 +68,13 @@ class MaloneApp:
         )
 
         audio_playback = AudioPlayback(
-            sample_rate=24000,  # edge-tts output rate
+            sample_rate=tts.sample_rate,  # Match TTS output rate
             device=self.settings.audio.output_device,
         )
 
+        print("  Loading text-to-speech (Piper)...")
         tts = TTSSynthesizer(
             voice=self.settings.tts.voice,
-            rate=self.settings.tts.rate,
-            volume=self.settings.tts.volume,
         )
 
         conversation = ConversationManager(
